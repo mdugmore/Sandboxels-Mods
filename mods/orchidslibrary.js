@@ -1,6 +1,4 @@
-
-
-
+//v1.1.0
 function noiseify(color, range){
     if(color.startsWith("#")){
         color = hexToRGB(color);
@@ -75,15 +73,3 @@ function pixelToggle(pixel, multi = {r:1,g:1,b:1}){
 function normalize(obj){
     return `rgb(${obj.r},${obj.g},${obj.b})`;
 }
-let mixConditions = {
-	ifDifferent: function(p1,p2){
-		let res = false;
-		let rgb1 = getRGB(p1.color), rgb2 = getRGB(p2.color);
-		for(let key in rgb1){
-			if(rgb1[key] < rgb2[key]+6 || rgb1[key] > rgb2[key]-6){
-				res = true;
-			}
-		}
-		return res;
-	}
-};

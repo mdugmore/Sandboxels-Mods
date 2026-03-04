@@ -1,5 +1,5 @@
 /*
-*Version 2.2.1
+*Version 2.2.2
 */
 
 
@@ -174,7 +174,7 @@ class growInterval {
            this.interval = interval;
        }
    }
-dependOn("orchidslibrary.js", ()=>{
+dependOn("http://localhost:3500/orchidslibrary.js", ()=>{
    
     let flowerExclude = ["pineapple"];
     let vineGrow = ["wood", "rock_wall", "straw", "wall", "ewall", "bush_cane", "bush_base", "fruit_branch"];
@@ -910,7 +910,7 @@ dependOn("orchidslibrary.js", ()=>{
         for(let i = 0; i < squareCoords.length; i++){
             let x = pixel.x+squareCoords[i][0], y = pixel.y+squareCoords[i][1];
             if(!isEmpty(x,y) && !outOfBounds(x,y) && pixelMap[x][y].element == pixel.element && Math.random() < 0.005){
-                colorMix(pixel, pixelMap[x][y], 0.5, mixConditions.ifDifferent);
+                colorMix(pixel, pixelMap[x][y], 0.5);
             }
         }
     }
@@ -918,7 +918,7 @@ dependOn("orchidslibrary.js", ()=>{
         for(let i = 0; i < squareCoords.length; i++){
             let x = pixel.x+squareCoords[i][0], y = pixel.y+squareCoords[i][1];
             if(!isEmpty(x,y) && !outOfBounds(x,y) && pixelMap[x][y].element == pixel.element && Math.random() < 0.5){
-                colorMix(pixel, pixelMap[x][y], 0.5, mixConditions.ifDifferent);
+                colorMix(pixel, pixelMap[x][y], 0.5);
             }
         }
     }
@@ -926,7 +926,7 @@ dependOn("orchidslibrary.js", ()=>{
         for(let i = 0; i < squareCoords.length; i++){
             let x = pixel.x+squareCoords[i][0], y = pixel.y+squareCoords[i][1];
             if(!isEmpty(x,y) && !outOfBounds(x,y) && pixelMap[x][y].element == pixel.element && Math.random() < 0.005){
-                colorMix(pixel, pixelMap[x][y], 0.5, mixConditions.ifDifferent);
+                colorMix(pixel, pixelMap[x][y], 0.5);
             }
         }
     }
@@ -934,7 +934,7 @@ dependOn("orchidslibrary.js", ()=>{
         for(let i = 0; i < squareCoords.length; i++){
             let x = pixel.x+squareCoords[i][0], y = pixel.y+squareCoords[i][1];
             if(!isEmpty(x,y) && !outOfBounds(x,y) && pixelMap[x][y].element == pixel.element && Math.random() < 0.5){
-                colorMix(pixel, pixelMap[x][y], 0.5, mixConditions.ifDifferent);
+                colorMix(pixel, pixelMap[x][y], 0.5);
             }
         }
     }
@@ -1731,4 +1731,3 @@ dependOn("orchidslibrary.js", ()=>{
 
     
 }, true);
-  

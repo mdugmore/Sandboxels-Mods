@@ -1,4 +1,4 @@
-/*Version 1.2.1 Pseudorandom world generator*/
+/*Version 1.2.2 Pseudorandom world generator*/
 function pseudorandom(key, num, max = 1){
     return (Math.log(key)*(num*Math.log(1625.4986772154357))) % max;
 };
@@ -27,7 +27,7 @@ runAfterLoad(()=>{
 	let dropDown = document.createElement("select");
 	dropDown.id = "promptDropdown";
 	dropDown.style.position = "absolute";
-	dropDown.style.top = "15%";
+	dropDown.style.top = "45%";
 	dropDown.style.left = "42.5%";
 	dropDown.style.width = "15%";
 	dropDown.title = "prompt";
@@ -104,7 +104,7 @@ function showPromptScreen() {
 			dropDown.innerHTML += `<option value="${choice}">${choice.capitalize()}</option>`;
 		}
 		let span = document.createElement("span");
-		span.className = "promptOK";
+		span.className = "menuBottomButton";
 		span.textContent = "Select";
 		span.onclick = ()=>{
 			let c = dropDown.value;
