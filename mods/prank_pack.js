@@ -11,10 +11,16 @@ Prank Pack mod
 
 	const MOD_ID = "prank_pack";
 
-	// Keep dependencies soft so this mod can be loaded alongside many different mod sets.
-	const have = (name) => typeof elements !== "undefined" && elements && elements[name];
-	const inBounds = (x, y) => typeof outOfBounds === "function" ? !outOfBounds(x, y) : true;
-	const afterLoad = (fn) => (typeof runAfterLoad === "function" ? runAfterLoad(fn) : fn());
+	function prankPackInit() {
+		// Don’t run until the engine globals exist.
+		if (typeof elements === "undefined" || typeof behaviors === "undefined") return false;
+
+		// Avoid re-registering if the mod is loaded twice.
+		if (elements.whoopee_cushion || elements.fart_gas || elements.plunger) return true;
+
+		// Keep dependencies soft so this mod can be loaded alongside many different mod sets.
+		const have = (name) => !!(elements && elements[name]);
+		const inBounds = (x, y) => (typeof outOfBounds === "function" ? !outOfBounds(x, y) : true);
 
 	function randInt(min, maxInclusive) {
 		return Math.floor(Math.random() * (maxInclusive - min + 1)) + min;
@@ -158,7 +164,7 @@ Prank Pack mod
 		name: "Whoopee Cushion",
 		color: ["#d64545", "#e05656", "#b72f2f"],
 		behavior: behaviors.SUPPORT,
-		category: "pranks",
+		category: "special",
 		state: "solid",
 		density: 1200,
 		hardness: 0.3,
@@ -186,7 +192,7 @@ Prank Pack mod
 		name: "Deflated Whoopee Cushion",
 		color: ["#8f2b2b", "#a13a3a"],
 		behavior: behaviors.SUPPORT,
-		category: "pranks",
+		category: "special",
 		state: "solid",
 		density: 1200,
 		hardness: 0.3,
@@ -205,7 +211,7 @@ Prank Pack mod
 		name: "Toilet Clog",
 		color: ["#5c3a1b", "#4a2d12", "#6f4a25"],
 		behavior: behaviors.POWDER,
-		category: "pranks",
+		category: "special",
 		state: "solid",
 		density: 1400,
 		stain: 0.25,
@@ -279,7 +285,7 @@ Prank Pack mod
 	elements.plunger = {
 		name: "Plunger",
 		color: ["#b50000", "#c60000", "#8b5a2b"],
-		category: "tools",
+		category: "edit",
 		excludeRandom: true,
 		cooldown: 2,
 		desc: "Unclogs toilets/drains/vents and splashes nearby gross stuff upward.",
@@ -326,22 +332,39 @@ Prank Pack mod
 	};
 
 	// Quick compatibility: if the base elements exist, make them "aware" of fart gas a bit.
-	afterLoad(function () {
-		// A little extra chaos: water will "dilute" fart gas into stench sometimes.
-		if (have("fart_gas") && have("stench") && have("dirty_water")) {
-			elements.fart_gas.reactions ??= {};
-			elements.fart_gas.reactions.water = { elem1: "stench", elem2: "dirty_water", chance: 0.05 };
-		}
+	// A little extra chaos: water will "dilute" fart gas into stench sometimes.
+	if (have("fart_gas") && have("stench") && have("dirty_water")) {
+		elements.fart_gas.reactions ??= {};
+		elements.fart_gas.reactions.water = { elem1: "stench", elem2: "dirty_water", chance: 0.05 };
+	}
 
-		// Tag these elements so other mods/tools can recognize them (optional convention).
-		for (const k of ["fart_gas", "toilet_clog"]) {
-			if (have(k)) {
-				elements[k].isPrank ??= true;
-				elements[k].mod ??= MOD_ID;
-			}
-		}
+	if (have("fart_gas") && have("stench")) {
+		elements.fart_gas.ignore ??= [];
+		if (!elements.fart_gas.ignore.includes("stench")) elements.fart_gas.ignore.push("stench");
+	}
 
-		// Make drains/vents/toilets resist getting overwritten by other reactions that would delete them.
-		// (No invasive overrides here; the clogging behavior lives in toilet_clog.tick.)
-	});
+	// Tag these elements so other mods/tools can recognize them (optional convention).
+	for (const k of ["fart_gas", "toilet_clog"]) {
+		if (have(k)) {
+			elements[k].isPrank ??= true;
+			elements[k].mod ??= MOD_ID;
+		}
+	}
+
+	return true;
+	}
+
+	// Prefer runAfterLoad when available; otherwise poll until the engine is ready.
+	(function schedule() {
+		if (typeof runAfterLoad === "function") {
+			runAfterLoad(prankPackInit);
+			return;
+		}
+		const root = typeof window !== "undefined" ? window : globalThis;
+		const tick = function () {
+			if (prankPackInit()) return;
+			if (root && typeof root.setTimeout === "function") root.setTimeout(tick, 25);
+		};
+		tick();
+	})();
 })();
