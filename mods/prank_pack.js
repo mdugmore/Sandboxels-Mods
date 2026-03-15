@@ -12,7 +12,7 @@ Prank Pack mod
 	const MOD_ID = "prank_pack";
 
 	function prankPackInit() {
-		// Don’t run until the engine globals exist.
+		// Don't run until the engine globals exist.
 		if (typeof elements === "undefined" || typeof behaviors === "undefined") return false;
 
 		// Avoid re-registering if the mod is loaded twice.
@@ -49,7 +49,7 @@ Prank Pack mod
 
 	function makeFartPuff(x, y, amount, maxLife) {
 		if (typeof createPixel !== "function") return;
-		const n = amount ?? randInt(6, 12);
+		const n = (typeof amount === "number") ? amount : randInt(6, 12);
 		for (let i = 0; i < n; i++) {
 			// Bias upward and slightly to the sides.
 			const dx = randInt(-2, 2);
@@ -61,7 +61,9 @@ Prank Pack mod
 			createPixel("fart_gas", x2, y2);
 			const p = getPixelSafe(x2, y2);
 			if (p) {
-				p.pp_life = Math.min(p.pp_life ?? 9999, maxLife ?? randInt(120, 220));
+				const existingLife = (p.pp_life === undefined) ? 9999 : p.pp_life;
+				const capLife = (typeof maxLife === "number") ? maxLife : randInt(120, 220);
+				p.pp_life = Math.min(existingLife, capLife);
 			}
 		}
 
@@ -95,7 +97,7 @@ Prank Pack mod
 
 	function tryYeet(pixel, strength) {
 		if (!pixel || typeof tryMove !== "function") return false;
-		const s = strength ?? 2;
+		const s = (typeof strength === "number") ? strength : 2;
 		for (let i = 0; i < 4; i++) {
 			const dx = randInt(-s, s);
 			const dy = -randInt(1, s); // mostly upward
@@ -135,7 +137,7 @@ Prank Pack mod
 		burnInto: ["smoke", "smoke", "smoke", "stench"],
 		reactions: {},
 		tick: function (pixel) {
-			pixel.pp_life ??= randInt(160, 260);
+			if (pixel.pp_life === undefined) pixel.pp_life = randInt(160, 260);
 			pixel.pp_life--;
 			if (pixel.pp_life <= 0) {
 				// Decay into stench or disappear.
@@ -198,7 +200,7 @@ Prank Pack mod
 		hardness: 0.3,
 		hidden: true,
 		tick: function (pixel) {
-			pixel.pp_inflate ??= randInt(70, 120);
+			if (pixel.pp_inflate === undefined) pixel.pp_inflate = randInt(70, 120);
 			pixel.pp_inflate--;
 			if (pixel.pp_inflate <= 0) {
 				delete pixel.pp_inflate;
@@ -334,20 +336,20 @@ Prank Pack mod
 	// Quick compatibility: if the base elements exist, make them "aware" of fart gas a bit.
 	// A little extra chaos: water will "dilute" fart gas into stench sometimes.
 	if (have("fart_gas") && have("stench") && have("dirty_water")) {
-		elements.fart_gas.reactions ??= {};
+		elements.fart_gas.reactions = elements.fart_gas.reactions || {};
 		elements.fart_gas.reactions.water = { elem1: "stench", elem2: "dirty_water", chance: 0.05 };
 	}
 
 	if (have("fart_gas") && have("stench")) {
-		elements.fart_gas.ignore ??= [];
+		elements.fart_gas.ignore = elements.fart_gas.ignore || [];
 		if (!elements.fart_gas.ignore.includes("stench")) elements.fart_gas.ignore.push("stench");
 	}
 
 	// Tag these elements so other mods/tools can recognize them (optional convention).
 	for (const k of ["fart_gas", "toilet_clog"]) {
 		if (have(k)) {
-			elements[k].isPrank ??= true;
-			elements[k].mod ??= MOD_ID;
+			if (elements[k].isPrank === undefined) elements[k].isPrank = true;
+			if (elements[k].mod === undefined) elements[k].mod = MOD_ID;
 		}
 	}
 
